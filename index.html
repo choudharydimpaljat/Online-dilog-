@@ -51,7 +51,7 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
 </style>
 </head>
 <body>
-<div class="card" id="card">
+<div class="card">
   <div class="header">
     <div class="icon-wrap">🔐</div>
     <div class="title">License Activation</div>
@@ -83,46 +83,32 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════
-//  Global state
-// ══════════════════════════════════════════════════════
-var keysUrl  = "";      // Android inject karega via setKeysUrl()
+// ═══════════════════════════════════════════════
+//  🔧 SIRF YEH URL CHANGE KARO
+//  Key file ka direct raw URL — Android pe depend nahi
+// ═══════════════════════════════════════════════
+var KEYS_URL = "https://raw.githubusercontent.com/choudharydimpaljat/Demo/refs/heads/main/Key";
+// ═══════════════════════════════════════════════
+
 var deviceId = "";
 
-// ══════════════════════════════════════════════════════
-//  Android → HTML: sirf URL inject hoga (simple string)
-//  Java: webView.evaluateJavascript("setKeysUrl('URL')", null)
-// ══════════════════════════════════════════════════════
-function setKeysUrl(url) {
-  keysUrl = url;
-  // URL mil gayi — ab fetch ready hai
-}
-
-// ── Device ID Android se milega ──
+// Android se device ID aayegi
 function setDeviceId(id) {
-  deviceId = id;
+  deviceId = id || "";
   document.getElementById("deviceVal").textContent = id || "Unknown";
 }
 
-// ── Page load ──
+// Page load hone par Android se device ID lo
 window.addEventListener("load", function() {
-  // Device ID lo
   try {
     if (typeof AndroidBridge !== "undefined") {
       var id = AndroidBridge.getDeviceId();
       if (id) setDeviceId(id);
     }
   } catch(e) {}
-
-  // Android ko batao page ready hai — wo URL inject karega
-  try {
-    if (typeof AndroidBridge !== "undefined") {
-      AndroidBridge.onPageReady();
-    }
-  } catch(e) {}
 });
 
-// ── Copy Device ID ──
+// Copy device ID
 function copyDeviceId() {
   if (!deviceId) return;
   try {
@@ -130,83 +116,64 @@ function copyDeviceId() {
       navigator.clipboard.writeText(deviceId);
     } else {
       var t = document.createElement("textarea");
-      t.value = deviceId;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand("copy");
+      t.value = deviceId; document.body.appendChild(t);
+      t.select(); document.execCommand("copy");
       document.body.removeChild(t);
     }
     setStatus("📋 Device ID copied!", "var(--accent)");
   } catch(e) {}
 }
 
-// ── Activate button ──
+// Activate button
 function activate() {
   var key = document.getElementById("keyInput").value.trim().toUpperCase();
   if (!key) {
-    setStatus("❌ License key khali nahi honi chahiye!", "var(--error)");
-    errorInput();
-    return;
+    setStatus("❌ License key daalo!", "var(--error)");
+    shake(); return;
   }
-
-  if (!keysUrl) {
-    setStatus("⚠️ Config load nahi hua. App restart karo.", "var(--warn)");
-    return;
-  }
-
   setLoading(true);
-  setStatus("🔄 Verifying license...", "var(--text)");
+  setStatus("🔄 Verifying...", "var(--text)");
 
-  // HTML khud JSON fetch karega — koi injection problem nahi
-  fetch(keysUrl + "?t=" + Date.now(), { cache: "no-store" })
+  // HTML khud directly Key file fetch karta hai — koi injection nahi
+  fetch(KEYS_URL + "?t=" + Date.now(), { cache: "no-store" })
     .then(function(r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
+      if (!r.ok) throw new Error(r.status);
       return r.json();
     })
-    .then(function(data) {
-      verify(data.keys || [], key);
-    })
-    .catch(function(err) {
+    .then(function(data) { verify(data.keys || [], key); })
+    .catch(function() {
       setLoading(false);
       setStatus("⚠️ Net error. Connection check karo.", "var(--warn)");
       try { AndroidBridge.onLicenseFailed("network"); } catch(e) {}
     });
 }
 
-// ── Verify ──
+// Verify karo
 function verify(keys, inputKey) {
   var found = null;
   for (var i = 0; i < keys.length; i++) {
-    if ((keys[i].key || "").toUpperCase() === inputKey) {
-      found = keys[i];
-      break;
-    }
+    if ((keys[i].key || "").toUpperCase() === inputKey) { found = keys[i]; break; }
   }
   setLoading(false);
 
   if (!found) {
-    setStatus("❌ Invalid License Key!", "var(--error)");
-    errorInput();
+    setStatus("❌ Invalid License Key!", "var(--error)"); shake();
     try { AndroidBridge.onLicenseFailed("invalid"); } catch(e) {}
     return;
   }
-
   if (found.banned === true) {
-    setStatus("🚫 Yeh key banned hai! Admin se contact karo.", "var(--error)");
+    setStatus("🚫 Key banned hai! Admin se contact karo.", "var(--error)");
     try { AndroidBridge.onLicenseFailed("banned"); } catch(e) {}
     return;
   }
-
   if (found.expiry && found.expiry !== "lifetime") {
-    var exp = new Date(found.expiry);
-    exp.setHours(23, 59, 59);
+    var exp = new Date(found.expiry); exp.setHours(23,59,59);
     if (new Date() > exp) {
-      setStatus("⏰ License expire ho gayi! Nayi key lo.", "var(--error)");
+      setStatus("⏰ License expire ho gayi!", "var(--error)");
       try { AndroidBridge.onLicenseFailed("expired"); } catch(e) {}
       return;
     }
   }
-
   var bound = found.device_id || "any";
   if (bound !== "any" && bound !== "" && deviceId && bound !== deviceId) {
     setStatus("📵 Yeh key is device ke liye nahi!\nDevice ID admin ko bhejo.", "var(--error)");
@@ -217,30 +184,25 @@ function verify(keys, inputKey) {
   // ✅ SUCCESS
   document.getElementById("successOverlay").classList.add("show");
   setTimeout(function() {
-    try {
-      AndroidBridge.onLicenseSuccess(inputKey, found.offline_login === true);
-    } catch(e) {}
+    try { AndroidBridge.onLicenseSuccess(inputKey, found.offline_login === true); } catch(e) {}
   }, 1300);
 }
 
-// ── UI helpers ──
 function setStatus(msg, color) {
   var el = document.getElementById("statusBox");
   el.textContent = msg;
   el.style.color = color || "var(--muted)";
-  el.style.background = color ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.03)";
+  el.style.background = color ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.03)";
 }
-
 function setLoading(on) {
   document.getElementById("activateBtn").disabled = on;
   document.getElementById("progressBar").style.display = on ? "block" : "none";
   document.getElementById("keyInput").disabled = on;
 }
-
-function errorInput() {
+function shake() {
   var el = document.getElementById("keyInput");
   el.classList.add("error");
-  setTimeout(function() { el.classList.remove("error"); }, 1200);
+  setTimeout(function(){ el.classList.remove("error"); }, 1200);
 }
 </script>
 </body>
