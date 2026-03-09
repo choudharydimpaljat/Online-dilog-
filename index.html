@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>License</title>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#0d0d1a; --card:#12122a; --border:rgba(108,99,255,0.35);
+  --accent:#6c63ff; --accent2:#ff6584; --text:#e0e0f0; --muted:#555577;
+  --success:#4ade80; --error:#ff6b6b; --warn:#fbbf24; --input-bg:rgba(255,255,255,0.04);
+}
+html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Segoe UI',system-ui,sans-serif; color:var(--text); overflow-x:hidden; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:28px 22px 24px; margin:12px; position:relative; overflow:hidden; box-shadow:0 8px 40px rgba(108,99,255,0.12),0 2px 8px rgba(0,0,0,0.4); }
+.card::before { content:''; position:absolute; top:0; left:-100%; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),var(--accent),transparent); animation:shimmer 2.5s ease-in-out infinite; }
+@keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
+.header { text-align:center; margin-bottom:20px; }
+.icon-wrap { width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(255,101,132,0.15)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:26px; animation:iconFloat 3s ease-in-out infinite; }
+@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+.title { font-size:20px; font-weight:700; letter-spacing:0.5px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.subtitle { font-size:11px; color:var(--muted); margin-top:3px; letter-spacing:1.5px; text-transform:uppercase; }
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:0 0 18px; }
+.field-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; }
+.device-box { background:rgba(108,99,255,0.07); border:1px solid rgba(108,99,255,0.2); border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:border-color 0.2s; margin-bottom:3px; }
+.device-box:active { border-color:var(--accent); }
+.device-id-val { flex:1; font-family:'Courier New',monospace; font-size:12px; color:#8b8bff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.copy-icon { font-size:15px; flex-shrink:0; opacity:0.7; }
+.copy-hint { font-size:10px; color:var(--muted); text-align:right; margin-bottom:16px; }
+.input-wrap { position:relative; margin-bottom:12px; }
+.key-input { width:100%; background:var(--input-bg); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:13px 44px 13px 14px; color:var(--text); font-size:14px; font-family:'Courier New',monospace; letter-spacing:1px; outline:none; transition:border-color 0.25s,box-shadow 0.25s; -webkit-appearance:none; }
+.key-input::placeholder { color:rgba(255,255,255,0.2); font-family:'Segoe UI',sans-serif; letter-spacing:0; }
+.key-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
+.key-input.error { border-color:var(--error); box-shadow:0 0 0 3px rgba(255,107,107,0.12); }
+.key-icon { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; opacity:0.5; }
+.status { font-size:12px; min-height:32px; padding:7px 12px; border-radius:10px; background:rgba(255,255,255,0.03); color:var(--muted); text-align:center; margin-bottom:12px; transition:all 0.3s; display:flex; align-items:center; justify-content:center; line-height:1.4; }
+.progress { height:2px; background:rgba(108,99,255,0.12); border-radius:2px; margin-bottom:12px; overflow:hidden; display:none; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; animation:progressSlide 1.2s ease-in-out infinite; }
+@keyframes progressSlide { 0%{width:0%;margin-left:0%} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
+.btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),#8b5cf6); border:none; border-radius:14px; color:white; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 20px rgba(108,99,255,0.3); transition:transform 0.15s,box-shadow 0.15s,opacity 0.15s; margin-bottom:14px; }
+.btn:active:not(:disabled) { transform:scale(0.97); box-shadow:0 2px 10px rgba(108,99,255,0.2); }
+.btn:disabled { opacity:0.45; cursor:not-allowed; }
+.footer { text-align:center; font-size:11px; color:var(--muted); }
+.footer a { color:#8b8bff; text-decoration:none; }
+.success-overlay { display:none; position:absolute; inset:0; background:rgba(13,13,26,0.97); border-radius:22px; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px; z-index:99; }
+.success-overlay.show { display:flex; }
+.success-ring { width:72px; height:72px; border-radius:50%; border:2px solid var(--success); display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:16px; animation:ringPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); box-shadow:0 0 30px rgba(74,222,128,0.25); }
+@keyframes ringPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+.success-title { font-size:20px; font-weight:700; color:var(--success); margin-bottom:6px; }
+.success-sub { font-size:12px; color:var(--muted); line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="header">
+    <div class="icon-wrap">🔐</div>
+    <div class="title">License Activation</div>
+    <div class="subtitle">NMMS MOD · Pro</div>
+  </div>
+  <div class="divider"></div>
+  <div class="field-label">📱 Device ID</div>
+  <div class="device-box" onclick="copyDeviceId()">
+    <span class="device-id-val" id="deviceVal">Detecting...</span>
+    <span class="copy-icon">📋</span>
+  </div>
+  <div class="copy-hint">tap to copy</div>
+  <div class="field-label">🔑 License Key</div>
+  <div class="input-wrap">
+    <input type="text" class="key-input" id="keyInput"
+      placeholder="NMMS-XXXX-YYYY-ZZZZ"
+      autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="characters"/>
+    <span class="key-icon">🗝️</span>
+  </div>
+  <div class="progress" id="progressBar"><div class="progress-fill"></div></div>
+  <div class="status" id="statusBox">Key enter karke activate karo</div>
+  <button class="btn" id="activateBtn" onclick="activate()">⚡ Activate Now</button>
+  <div class="footer">Key chahiye? &nbsp;<a href="https://t.me/nmmsmod">📲 t.me/nmmsmod</a></div>
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-ring">✓</div>
+    <div class="success-title">Activated!</div>
+    <div class="success-sub">License verified.<br>App unlock ho raha hai...</div>
+  </div>
+</div>
+<script>
+// ══════════════════════════════════════════
+//  🔧 YEH URL CHANGE KARO — keys.json
+// ══════════════════════════════════════════
+const KEYS_URL = "https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/keys.json";
+
+// ══════════════════════════════════════════
+//  🎛️ DIALOG SHOW/HIDE REMOTE CONTROL
+//  true  = dialog dikhao
+//  false = koi dialog nahi, seedha entry
+// ══════════════════════════════════════════
+const DIALOG_ENABLED = true;
+// ══════════════════════════════════════════
+
+var deviceId = "";
+
+function setDeviceId(id) {
+  deviceId = id;
+  document.getElementById("deviceVal").textContent = id || "Unknown";
+}
+
+function checkDialogEnabled() {
+  try { if (typeof PreloadBridge !== "undefined") PreloadBridge.onDialogEnabledResult(DIALOG_ENABLED); } catch(e) {}
+  if (!DIALOG_ENABLED) { try { AndroidBridge.dismiss(); } catch(e) {} }
+}
+
+window.addEventListener("load", function() {
+  try {
+    var bridge = (typeof AndroidBridge !== "undefined") ? AndroidBridge
+               : (typeof PreloadBridge !== "undefined") ? PreloadBridge : null;
+    if (bridge) { var id = bridge.getDeviceId(); if (id) setDeviceId(id); }
+  } catch(e) {}
+  checkDialogEnabled();
+});
+
+function copyDeviceId() {
+  if (!deviceId) return;
+  try {
+    if (navigator.clipboard) { navigator.clipboard.writeText(deviceId); }
+    else { var t=document.createElement("textarea"); t.value=deviceId; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); }
+    setStatus("📋 Device ID copied!", "var(--accent)");
+  } catch(e) { setStatus("Device ID: " + deviceId, "var(--accent)"); }
+}
+
+function activate() {
+  var key = document.getElementById("keyInput").value.trim().toUpperCase();
+  if (!key) { setStatus("❌ License key khali nahi honi chahiye!", "var(--error)"); errorInput(); return; }
+  setLoading(true);
+  setStatus("🔄 Verifying license...", "var(--text)");
+  fetch(KEYS_URL + "?nc=" + Date.now(), { cache: "no-store" })
+    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(data) { verify(data, key); })
+    .catch(function() {
+      setLoading(false);
+      setStatus("⚠️ Net error. Connection check karo.", "var(--warn)");
+      try { AndroidBridge.onLicenseFailed("network"); } catch(e) {}
+    });
+}
+
+function verify(data, inputKey) {
+  var keys = data.keys || [], found = null;
+  for (var i = 0; i < keys.length; i++) {
+    if ((keys[i].key || "").toUpperCase() === inputKey) { found = keys[i]; break; }
+  }
+  setLoading(false);
+  if (!found) { setStatus("❌ Invalid License Key!", "var(--error)"); errorInput(); try { AndroidBridge.onLicenseFailed("invalid"); } catch(e) {} return; }
+  if (found.banned === true) { setStatus("🚫 Yeh key banned hai! Admin se contact karo.", "var(--error)"); try { AndroidBridge.onLicenseFailed("banned"); } catch(e) {} return; }
+  if (found.expiry && found.expiry !== "lifetime") {
+    var exp = new Date(found.expiry); exp.setHours(23,59,59);
+    if (new Date() > exp) { setStatus("⏰ License expire ho gayi! Nayi key lo.", "var(--error)"); try { AndroidBridge.onLicenseFailed("expired"); } catch(e) {} return; }
+  }
+  var bound = found.device_id || "any";
+  if (bound !== "any" && bound !== "" && deviceId && bound !== deviceId) {
+    setStatus("📵 Yeh key is device ke liye nahi hai!\nDevice ID admin ko bhejo.", "var(--error)");
+    try { AndroidBridge.onLicenseFailed("device_mismatch"); } catch(e) {} return;
+  }
+  showSuccess(inputKey, found.offline_login === true);
+}
+
+function showSuccess(key, offlineLogin) {
+  document.getElementById("successOverlay").classList.add("show");
+  setTimeout(function() { try { AndroidBridge.onLicenseSuccess(key, offlineLogin); } catch(e) {} }, 1300);
+}
+
+function setStatus(msg, color) {
+  var el = document.getElementById("statusBox");
+  el.textContent = msg;
+  el.style.color = color || "var(--muted)";
+  el.style.background = color ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.03)";
+}
+
+function setLoading(on) {
+  document.getElementById("activateBtn").disabled = on;
+  document.getElementById("progressBar").style.display = on ? "block" : "none";
+  document.getElementById("keyInput").disabled = on;
+}
+
+function errorInput() {
+  var el = document.getElementById("keyInput");
+  el.classList.add("error");
+  setTimeout(function() { el.classList.remove("error"); }, 1200);
+}
+</script>
+</body>
+</html>
