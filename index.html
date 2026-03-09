@@ -48,6 +48,9 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
 @keyframes ringPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
 .success-title { font-size:20px; font-weight:700; color:var(--success); margin-bottom:6px; }
 .success-sub { font-size:12px; color:var(--muted); line-height:1.6; }
+
+/* Waiting for data state */
+.waiting { opacity:0.5; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -81,90 +84,148 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
     <div class="success-sub">License verified.<br>App unlock ho raha hai...</div>
   </div>
 </div>
+
 <script>
-// ══════════════════════════════════════════
-//  🔧 YEH URL CHANGE KARO — keys.json
-// ══════════════════════════════════════════
-const KEYS_URL = "https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/keys.json";
+// ══════════════════════════════════════════════════════
+//  Keys data — Android inject karega via evaluateJavascript
+//  App se: setKeysData('[{"key":"..."}]')
+// ══════════════════════════════════════════════════════
+var keysData   = null;   // Android inject karega
+var deviceId   = "";
+var dataReady  = false;
 
-// ══════════════════════════════════════════
-//  🎛️ DIALOG SHOW/HIDE REMOTE CONTROL
-//  true  = dialog dikhao
-//  false = koi dialog nahi, seedha entry
-// ══════════════════════════════════════════
-const DIALOG_ENABLED = true;
-// ══════════════════════════════════════════
+// ── Android se keys inject hogi ──
+function setKeysData(jsonStr) {
+  try {
+    keysData  = JSON.parse(jsonStr);
+    dataReady = true;
+    document.getElementById("activateBtn").classList.remove("waiting");
+    setStatus("Key enter karke activate karo", null);
+  } catch(e) {
+    setStatus("⚠️ Data load error. Restart karo.", "var(--warn)");
+  }
+}
 
-var deviceId = "";
-
+// ── Android se Device ID inject hogi ──
 function setDeviceId(id) {
   deviceId = id;
   document.getElementById("deviceVal").textContent = id || "Unknown";
 }
 
-function checkDialogEnabled() {
-  try { if (typeof PreloadBridge !== "undefined") PreloadBridge.onDialogEnabledResult(DIALOG_ENABLED); } catch(e) {}
-  if (!DIALOG_ENABLED) { try { AndroidBridge.dismiss(); } catch(e) {} }
-}
-
+// ── Page load ──
 window.addEventListener("load", function() {
+  // Button disable rakho jab tak data na aaye
+  document.getElementById("activateBtn").classList.add("waiting");
+  setStatus("🔄 Loading...", "var(--muted)");
+
+  // Device ID Android se lo
   try {
-    var bridge = (typeof AndroidBridge !== "undefined") ? AndroidBridge
-               : (typeof PreloadBridge !== "undefined") ? PreloadBridge : null;
-    if (bridge) { var id = bridge.getDeviceId(); if (id) setDeviceId(id); }
+    var b = (typeof AndroidBridge !== "undefined") ? AndroidBridge : null;
+    if (b) {
+      var id = b.getDeviceId();
+      if (id) setDeviceId(id);
+    }
   } catch(e) {}
-  checkDialogEnabled();
+
+  // Android ko signal do ke page ready hai
+  try {
+    if (typeof AndroidBridge !== "undefined") {
+      AndroidBridge.onPageReady();
+    }
+  } catch(e) {}
 });
 
+// ── Copy Device ID ──
 function copyDeviceId() {
   if (!deviceId) return;
   try {
     if (navigator.clipboard) { navigator.clipboard.writeText(deviceId); }
-    else { var t=document.createElement("textarea"); t.value=deviceId; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); }
+    else {
+      var t = document.createElement("textarea");
+      t.value = deviceId;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
+      document.body.removeChild(t);
+    }
     setStatus("📋 Device ID copied!", "var(--accent)");
-  } catch(e) { setStatus("Device ID: " + deviceId, "var(--accent)"); }
+  } catch(e) {
+    setStatus("ID: " + deviceId, "var(--accent)");
+  }
 }
 
+// ── Activate ──
 function activate() {
+  if (!dataReady) {
+    setStatus("⏳ Thoda wait karo, data load ho raha hai...", "var(--warn)");
+    return;
+  }
   var key = document.getElementById("keyInput").value.trim().toUpperCase();
-  if (!key) { setStatus("❌ License key khali nahi honi chahiye!", "var(--error)"); errorInput(); return; }
+  if (!key) {
+    setStatus("❌ License key khali nahi honi chahiye!", "var(--error)");
+    errorInput();
+    return;
+  }
   setLoading(true);
   setStatus("🔄 Verifying license...", "var(--text)");
-  fetch(KEYS_URL + "?nc=" + Date.now(), { cache: "no-store" })
-    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function(data) { verify(data, key); })
-    .catch(function() {
-      setLoading(false);
-      setStatus("⚠️ Net error. Connection check karo.", "var(--warn)");
-      try { AndroidBridge.onLicenseFailed("network"); } catch(e) {}
-    });
+
+  // Slight delay for UX then verify
+  setTimeout(function() { verify(keysData, key); }, 400);
 }
 
-function verify(data, inputKey) {
-  var keys = data.keys || [], found = null;
+// ── Verify Logic (keys Android se inject ki hain) ──
+function verify(keys, inputKey) {
+  var found = null;
   for (var i = 0; i < keys.length; i++) {
-    if ((keys[i].key || "").toUpperCase() === inputKey) { found = keys[i]; break; }
+    if ((keys[i].key || "").toUpperCase() === inputKey) {
+      found = keys[i];
+      break;
+    }
   }
   setLoading(false);
-  if (!found) { setStatus("❌ Invalid License Key!", "var(--error)"); errorInput(); try { AndroidBridge.onLicenseFailed("invalid"); } catch(e) {} return; }
-  if (found.banned === true) { setStatus("🚫 Yeh key banned hai! Admin se contact karo.", "var(--error)"); try { AndroidBridge.onLicenseFailed("banned"); } catch(e) {} return; }
-  if (found.expiry && found.expiry !== "lifetime") {
-    var exp = new Date(found.expiry); exp.setHours(23,59,59);
-    if (new Date() > exp) { setStatus("⏰ License expire ho gayi! Nayi key lo.", "var(--error)"); try { AndroidBridge.onLicenseFailed("expired"); } catch(e) {} return; }
+
+  if (!found) {
+    setStatus("❌ Invalid License Key!", "var(--error)");
+    errorInput();
+    try { AndroidBridge.onLicenseFailed("invalid"); } catch(e) {}
+    return;
   }
+
+  if (found.banned === true) {
+    setStatus("🚫 Yeh key banned hai! Admin se contact karo.", "var(--error)");
+    try { AndroidBridge.onLicenseFailed("banned"); } catch(e) {}
+    return;
+  }
+
+  if (found.expiry && found.expiry !== "lifetime") {
+    var exp = new Date(found.expiry);
+    exp.setHours(23, 59, 59);
+    if (new Date() > exp) {
+      setStatus("⏰ License expire ho gayi! Nayi key lo.", "var(--error)");
+      try { AndroidBridge.onLicenseFailed("expired"); } catch(e) {}
+      return;
+    }
+  }
+
   var bound = found.device_id || "any";
   if (bound !== "any" && bound !== "" && deviceId && bound !== deviceId) {
-    setStatus("📵 Yeh key is device ke liye nahi hai!\nDevice ID admin ko bhejo.", "var(--error)");
-    try { AndroidBridge.onLicenseFailed("device_mismatch"); } catch(e) {} return;
+    setStatus("📵 Yeh key is device ke liye nahi!\nDevice ID admin ko bhejo.", "var(--error)");
+    try { AndroidBridge.onLicenseFailed("device_mismatch"); } catch(e) {}
+    return;
   }
+
+  // ✅ SUCCESS
   showSuccess(inputKey, found.offline_login === true);
 }
 
 function showSuccess(key, offlineLogin) {
   document.getElementById("successOverlay").classList.add("show");
-  setTimeout(function() { try { AndroidBridge.onLicenseSuccess(key, offlineLogin); } catch(e) {} }, 1300);
+  setTimeout(function() {
+    try { AndroidBridge.onLicenseSuccess(key, offlineLogin); } catch(e) {}
+  }, 1300);
 }
 
+// ── UI Helpers ──
 function setStatus(msg, color) {
   var el = document.getElementById("statusBox");
   el.textContent = msg;
