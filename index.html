@@ -48,9 +48,6 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
 @keyframes ringPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
 .success-title { font-size:20px; font-weight:700; color:var(--success); margin-bottom:6px; }
 .success-sub { font-size:12px; color:var(--muted); line-height:1.6; }
-
-/* Waiting for data state */
-.waiting { opacity:0.5; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -87,26 +84,21 @@ html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Sego
 
 <script>
 // ══════════════════════════════════════════════════════
-//  Keys data — Android inject karega via evaluateJavascript
-//  App se: setKeysData('[{"key":"..."}]')
+//  Global state
 // ══════════════════════════════════════════════════════
-var keysData   = null;   // Android inject karega
-var deviceId   = "";
-var dataReady  = false;
+var keysUrl  = "";      // Android inject karega via setKeysUrl()
+var deviceId = "";
 
-// ── Android se keys inject hogi ──
-function setKeysData(jsonStr) {
-  try {
-    keysData  = JSON.parse(jsonStr);
-    dataReady = true;
-    document.getElementById("activateBtn").classList.remove("waiting");
-    setStatus("Key enter karke activate karo", null);
-  } catch(e) {
-    setStatus("⚠️ Data load error. Restart karo.", "var(--warn)");
-  }
+// ══════════════════════════════════════════════════════
+//  Android → HTML: sirf URL inject hoga (simple string)
+//  Java: webView.evaluateJavascript("setKeysUrl('URL')", null)
+// ══════════════════════════════════════════════════════
+function setKeysUrl(url) {
+  keysUrl = url;
+  // URL mil gayi — ab fetch ready hai
 }
 
-// ── Android se Device ID inject hogi ──
+// ── Device ID Android se milega ──
 function setDeviceId(id) {
   deviceId = id;
   document.getElementById("deviceVal").textContent = id || "Unknown";
@@ -114,20 +106,15 @@ function setDeviceId(id) {
 
 // ── Page load ──
 window.addEventListener("load", function() {
-  // Button disable rakho jab tak data na aaye
-  document.getElementById("activateBtn").classList.add("waiting");
-  setStatus("🔄 Loading...", "var(--muted)");
-
-  // Device ID Android se lo
+  // Device ID lo
   try {
-    var b = (typeof AndroidBridge !== "undefined") ? AndroidBridge : null;
-    if (b) {
-      var id = b.getDeviceId();
+    if (typeof AndroidBridge !== "undefined") {
+      var id = AndroidBridge.getDeviceId();
       if (id) setDeviceId(id);
     }
   } catch(e) {}
 
-  // Android ko signal do ke page ready hai
+  // Android ko batao page ready hai — wo URL inject karega
   try {
     if (typeof AndroidBridge !== "undefined") {
       AndroidBridge.onPageReady();
@@ -139,8 +126,9 @@ window.addEventListener("load", function() {
 function copyDeviceId() {
   if (!deviceId) return;
   try {
-    if (navigator.clipboard) { navigator.clipboard.writeText(deviceId); }
-    else {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(deviceId);
+    } else {
       var t = document.createElement("textarea");
       t.value = deviceId;
       document.body.appendChild(t);
@@ -149,31 +137,43 @@ function copyDeviceId() {
       document.body.removeChild(t);
     }
     setStatus("📋 Device ID copied!", "var(--accent)");
-  } catch(e) {
-    setStatus("ID: " + deviceId, "var(--accent)");
-  }
+  } catch(e) {}
 }
 
-// ── Activate ──
+// ── Activate button ──
 function activate() {
-  if (!dataReady) {
-    setStatus("⏳ Thoda wait karo, data load ho raha hai...", "var(--warn)");
-    return;
-  }
   var key = document.getElementById("keyInput").value.trim().toUpperCase();
   if (!key) {
     setStatus("❌ License key khali nahi honi chahiye!", "var(--error)");
     errorInput();
     return;
   }
+
+  if (!keysUrl) {
+    setStatus("⚠️ Config load nahi hua. App restart karo.", "var(--warn)");
+    return;
+  }
+
   setLoading(true);
   setStatus("🔄 Verifying license...", "var(--text)");
 
-  // Slight delay for UX then verify
-  setTimeout(function() { verify(keysData, key); }, 400);
+  // HTML khud JSON fetch karega — koi injection problem nahi
+  fetch(keysUrl + "?t=" + Date.now(), { cache: "no-store" })
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      verify(data.keys || [], key);
+    })
+    .catch(function(err) {
+      setLoading(false);
+      setStatus("⚠️ Net error. Connection check karo.", "var(--warn)");
+      try { AndroidBridge.onLicenseFailed("network"); } catch(e) {}
+    });
 }
 
-// ── Verify Logic (keys Android se inject ki hain) ──
+// ── Verify ──
 function verify(keys, inputKey) {
   var found = null;
   for (var i = 0; i < keys.length; i++) {
@@ -215,17 +215,15 @@ function verify(keys, inputKey) {
   }
 
   // ✅ SUCCESS
-  showSuccess(inputKey, found.offline_login === true);
-}
-
-function showSuccess(key, offlineLogin) {
   document.getElementById("successOverlay").classList.add("show");
   setTimeout(function() {
-    try { AndroidBridge.onLicenseSuccess(key, offlineLogin); } catch(e) {}
+    try {
+      AndroidBridge.onLicenseSuccess(inputKey, found.offline_login === true);
+    } catch(e) {}
   }, 1300);
 }
 
-// ── UI Helpers ──
+// ── UI helpers ──
 function setStatus(msg, color) {
   var el = document.getElementById("statusBox");
   el.textContent = msg;
