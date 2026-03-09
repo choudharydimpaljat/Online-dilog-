@@ -5,100 +5,336 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>License</title>
 <style>
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-:root {
-  --bg:#0d0d1a; --card:#12122a; --border:rgba(108,99,255,0.35);
-  --accent:#6c63ff; --accent2:#ff6584; --text:#e0e0f0; --muted:#555577;
-  --success:#4ade80; --error:#ff6b6b; --warn:#fbbf24; --input-bg:rgba(255,255,255,0.04);
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
-html,body { width:100%; min-height:100%; background:var(--bg); font-family:'Segoe UI',system-ui,sans-serif; color:var(--text); overflow-x:hidden; }
-.card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:28px 22px 24px; margin:12px; position:relative; overflow:hidden; box-shadow:0 8px 40px rgba(108,99,255,0.12),0 2px 8px rgba(0,0,0,0.4); }
-.card::before { content:''; position:absolute; top:0; left:-100%; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),var(--accent),transparent); animation:shimmer 2.5s ease-in-out infinite; }
+
+:root {
+  --accent: #6c63ff;
+  --accent2: #ff6584;
+  --text: #e0e0f0;
+  --muted: #555577;
+  --success: #4ade80;
+  --error: #ff6b6b;
+  --warn: #fbbf24;
+  --input-bg: rgba(255,255,255,0.05);
+  --border: rgba(108,99,255,0.3);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* NO SCROLL */
+  background: #12122a;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: var(--text);
+}
+
+/* Card — fills the WebView completely, no scroll */
+.card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5vw 5vw 4vw;
+  overflow: hidden;
+  position: relative;
+  background: #12122a;
+}
+
+/* Top shimmer line */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), var(--accent), transparent);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
 @keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
-.header { text-align:center; margin-bottom:20px; }
-.icon-wrap { width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(255,101,132,0.15)); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:26px; animation:iconFloat 3s ease-in-out infinite; }
-@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-.title { font-size:20px; font-weight:700; letter-spacing:0.5px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-.subtitle { font-size:11px; color:var(--muted); margin-top:3px; letter-spacing:1.5px; text-transform:uppercase; }
-.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:0 0 18px; }
-.field-label { font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; }
-.device-box { background:rgba(108,99,255,0.07); border:1px solid rgba(108,99,255,0.2); border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:border-color 0.2s; margin-bottom:3px; }
-.device-box:active { border-color:var(--accent); }
-.device-id-val { flex:1; font-family:'Courier New',monospace; font-size:12px; color:#8b8bff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.copy-icon { font-size:15px; flex-shrink:0; opacity:0.7; }
-.copy-hint { font-size:10px; color:var(--muted); text-align:right; margin-bottom:16px; }
-.input-wrap { position:relative; margin-bottom:12px; }
-.key-input { width:100%; background:var(--input-bg); border:1.5px solid rgba(255,255,255,0.08); border-radius:14px; padding:13px 44px 13px 14px; color:var(--text); font-size:14px; font-family:'Courier New',monospace; letter-spacing:1px; outline:none; transition:border-color 0.25s,box-shadow 0.25s; -webkit-appearance:none; }
-.key-input::placeholder { color:rgba(255,255,255,0.2); font-family:'Segoe UI',sans-serif; letter-spacing:0; }
-.key-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
-.key-input.error { border-color:var(--error); box-shadow:0 0 0 3px rgba(255,107,107,0.12); }
-.key-icon { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; opacity:0.5; }
-.status { font-size:12px; min-height:32px; padding:7px 12px; border-radius:10px; background:rgba(255,255,255,0.03); color:var(--muted); text-align:center; margin-bottom:12px; transition:all 0.3s; display:flex; align-items:center; justify-content:center; line-height:1.4; }
-.progress { height:2px; background:rgba(108,99,255,0.12); border-radius:2px; margin-bottom:12px; overflow:hidden; display:none; }
-.progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; animation:progressSlide 1.2s ease-in-out infinite; }
-@keyframes progressSlide { 0%{width:0%;margin-left:0%} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
-.btn { width:100%; padding:14px; background:linear-gradient(135deg,var(--accent),#8b5cf6); border:none; border-radius:14px; color:white; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 20px rgba(108,99,255,0.3); transition:transform 0.15s,box-shadow 0.15s,opacity 0.15s; margin-bottom:14px; }
-.btn:active:not(:disabled) { transform:scale(0.97); box-shadow:0 2px 10px rgba(108,99,255,0.2); }
-.btn:disabled { opacity:0.45; cursor:not-allowed; }
-.footer { text-align:center; font-size:11px; color:var(--muted); }
-.footer a { color:#8b8bff; text-decoration:none; }
-.success-overlay { display:none; position:absolute; inset:0; background:rgba(13,13,26,0.97); border-radius:22px; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px; z-index:99; }
-.success-overlay.show { display:flex; }
-.success-ring { width:72px; height:72px; border-radius:50%; border:2px solid var(--success); display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:16px; animation:ringPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); box-shadow:0 0 30px rgba(74,222,128,0.25); }
+
+/* Header */
+.header {
+  text-align: center;
+  flex-shrink: 0;
+  margin-bottom: 3vw;
+}
+
+.icon-wrap {
+  width: 12vw; height: 12vw;
+  max-width: 52px; max-height: 52px;
+  border-radius: 4vw;
+  background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(255,101,132,0.15));
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  font-size: 6vw;
+  margin-bottom: 2vw;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+.title {
+  font-size: 5vw;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.subtitle {
+  font-size: 2.8vw;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 1vw;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  flex-shrink: 0;
+  margin-bottom: 3vw;
+}
+
+/* Field label */
+.label {
+  font-size: 2.5vw;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1.5vw;
+  flex-shrink: 0;
+}
+
+/* Device ID */
+.device-box {
+  background: rgba(108,99,255,0.07);
+  border: 1px solid rgba(108,99,255,0.2);
+  border-radius: 3vw;
+  padding: 2.5vw 3vw;
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-bottom: 1vw;
+}
+.device-box:active { border-color: var(--accent); }
+
+.device-id-val {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 3vw;
+  color: #8b8bff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.copy-icon { font-size: 4vw; flex-shrink: 0; opacity: 0.7; }
+.copy-hint {
+  font-size: 2.2vw;
+  color: var(--muted);
+  text-align: right;
+  margin-bottom: 3vw;
+  flex-shrink: 0;
+}
+
+/* Input */
+.input-wrap {
+  position: relative;
+  flex-shrink: 0;
+  margin-bottom: 2vw;
+}
+.key-input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 3.5vw;
+  padding: 3.5vw 10vw 3.5vw 4vw;
+  color: var(--text);
+  font-size: 3.5vw;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.key-input::placeholder {
+  color: rgba(255,255,255,0.2);
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+}
+.key-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108,99,255,0.12);
+}
+.key-input.error { border-color: var(--error); }
+.key-icon {
+  position: absolute;
+  right: 3.5vw; top: 50%;
+  transform: translateY(-50%);
+  font-size: 4.5vw;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Progress */
+.progress {
+  height: 2px;
+  background: rgba(108,99,255,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  display: none;
+  flex-shrink: 0;
+  margin-bottom: 2vw;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  animation: pSlide 1.2s ease-in-out infinite;
+}
+@keyframes pSlide { 0%{width:0%;margin-left:0%} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
+
+/* Status */
+.status {
+  font-size: 3vw;
+  min-height: 8vw;
+  padding: 2vw 3vw;
+  border-radius: 2.5vw;
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.4;
+  flex-shrink: 0;
+  margin-bottom: 2.5vw;
+  transition: all 0.3s;
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 4vw;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  border: none;
+  border-radius: 3.5vw;
+  color: white;
+  font-size: 3.8vw;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(108,99,255,0.3);
+  transition: transform 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+  margin-bottom: 3vw;
+}
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 2.8vw;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.footer a { color: #8b8bff; text-decoration: none; }
+
+/* Success overlay */
+.success-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(13,13,26,0.97);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8vw;
+  z-index: 99;
+}
+.success-overlay.show { display: flex; }
+
+.success-ring {
+  width: 18vw; height: 18vw;
+  border-radius: 50%;
+  border: 2px solid var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10vw;
+  margin-bottom: 4vw;
+  animation: ringPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  box-shadow: 0 0 30px rgba(74,222,128,0.2);
+}
 @keyframes ringPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
-.success-title { font-size:20px; font-weight:700; color:var(--success); margin-bottom:6px; }
-.success-sub { font-size:12px; color:var(--muted); line-height:1.6; }
+.success-title { font-size: 6vw; font-weight: 700; color: var(--success); margin-bottom: 2vw; }
+.success-sub { font-size: 3.5vw; color: var(--muted); line-height: 1.6; }
 </style>
 </head>
 <body>
 <div class="card">
+
   <div class="header">
     <div class="icon-wrap">🔐</div>
     <div class="title">License Activation</div>
     <div class="subtitle">NMMS MOD · Pro</div>
   </div>
+
   <div class="divider"></div>
-  <div class="field-label">📱 Device ID</div>
+
+  <div class="label">📱 Device ID</div>
   <div class="device-box" onclick="copyDeviceId()">
     <span class="device-id-val" id="deviceVal">Detecting...</span>
     <span class="copy-icon">📋</span>
   </div>
   <div class="copy-hint">tap to copy</div>
-  <div class="field-label">🔑 License Key</div>
+
+  <div class="label">🔑 License Key</div>
   <div class="input-wrap">
     <input type="text" class="key-input" id="keyInput"
       placeholder="NMMS-XXXX-YYYY-ZZZZ"
-      autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="characters"/>
+      autocomplete="off" spellcheck="false"
+      autocorrect="off" autocapitalize="characters"/>
     <span class="key-icon">🗝️</span>
   </div>
+
   <div class="progress" id="progressBar"><div class="progress-fill"></div></div>
+
   <div class="status" id="statusBox">Key enter karke activate karo</div>
+
   <button class="btn" id="activateBtn" onclick="activate()">⚡ Activate Now</button>
-  <div class="footer">Key chahiye? &nbsp;<a href="https://t.me/nmmsmod">📲 t.me/nmmsmod</a></div>
+
+  <div class="footer">
+    Key chahiye? &nbsp;<a href="https://t.me/nmmsmod">📲 t.me/nmmsmod</a>
+  </div>
+
   <div class="success-overlay" id="successOverlay">
     <div class="success-ring">✓</div>
     <div class="success-title">Activated!</div>
     <div class="success-sub">License verified.<br>App unlock ho raha hai...</div>
   </div>
+
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-//  🔧 SIRF YEH URL CHANGE KARO
-//  Key file ka direct raw URL — Android pe depend nahi
-// ═══════════════════════════════════════════════
+// 🔧 Key file URL — seedha hardcoded
 var KEYS_URL = "https://raw.githubusercontent.com/choudharydimpaljat/Demo/refs/heads/main/Key";
-// ═══════════════════════════════════════════════
 
 var deviceId = "";
 
-// Android se device ID aayegi
 function setDeviceId(id) {
   deviceId = id || "";
   document.getElementById("deviceVal").textContent = id || "Unknown";
 }
 
-// Page load hone par Android se device ID lo
 window.addEventListener("load", function() {
   try {
     if (typeof AndroidBridge !== "undefined") {
@@ -108,7 +344,6 @@ window.addEventListener("load", function() {
   } catch(e) {}
 });
 
-// Copy device ID
 function copyDeviceId() {
   if (!deviceId) return;
   try {
@@ -116,15 +351,16 @@ function copyDeviceId() {
       navigator.clipboard.writeText(deviceId);
     } else {
       var t = document.createElement("textarea");
-      t.value = deviceId; document.body.appendChild(t);
-      t.select(); document.execCommand("copy");
+      t.value = deviceId;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
       document.body.removeChild(t);
     }
     setStatus("📋 Device ID copied!", "var(--accent)");
   } catch(e) {}
 }
 
-// Activate button
 function activate() {
   var key = document.getElementById("keyInput").value.trim().toUpperCase();
   if (!key) {
@@ -134,7 +370,6 @@ function activate() {
   setLoading(true);
   setStatus("🔄 Verifying...", "var(--text)");
 
-  // HTML khud directly Key file fetch karta hai — koi injection nahi
   fetch(KEYS_URL + "?t=" + Date.now(), { cache: "no-store" })
     .then(function(r) {
       if (!r.ok) throw new Error(r.status);
@@ -148,7 +383,6 @@ function activate() {
     });
 }
 
-// Verify karo
 function verify(keys, inputKey) {
   var found = null;
   for (var i = 0; i < keys.length; i++) {
@@ -181,7 +415,7 @@ function verify(keys, inputKey) {
     return;
   }
 
-  // ✅ SUCCESS
+  // SUCCESS
   document.getElementById("successOverlay").classList.add("show");
   setTimeout(function() {
     try { AndroidBridge.onLicenseSuccess(inputKey, found.offline_login === true); } catch(e) {}
